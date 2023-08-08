@@ -25,6 +25,12 @@ public class Note {
         this.publicationDate = LocalDateTime.now();
     }
 
+    public Note(String title, String description, LocalDateTime publicationDate) {
+        this.title = title;
+        this.description = description;
+        this.publicationDate = LocalDateTime.now();
+    }
+
     public UUID getId() {
         return id;
     }
