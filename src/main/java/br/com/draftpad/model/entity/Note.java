@@ -1,4 +1,4 @@
-package br.com.draftpad.note.model.entity;
+package br.com.draftpad.model.entity;
 
 import jakarta.persistence.*;
 
