@@ -1,4 +1,4 @@
-package br.com.draftpad.note.model.response;
+package br.com.draftpad.service.note.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

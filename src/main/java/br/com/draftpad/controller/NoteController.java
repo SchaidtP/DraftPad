@@ -1,9 +1,9 @@
-package br.com.draftpad.note.controller;
+package br.com.draftpad.controller;
 
-import br.com.draftpad.note.model.request.RequestCreatingNote;
-import br.com.draftpad.note.model.request.RequestEditNote;
-import br.com.draftpad.note.model.response.ResponseGetNotes;
-import br.com.draftpad.note.service.INoteService;
+import br.com.draftpad.service.note.request.RequestCreatingNote;
+import br.com.draftpad.service.note.request.RequestEditNote;
+import br.com.draftpad.service.note.response.ResponseGetNotes;
+import br.com.draftpad.service.note.INoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;

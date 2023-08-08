@@ -1,6 +1,6 @@
-package br.com.draftpad.note.model.request;
+package br.com.draftpad.service.note.request;
 
-public class RequestCreatingNote {
+public class RequestEditNote {
     private String title;
     private String description;
 
