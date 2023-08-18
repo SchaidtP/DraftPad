@@ -1,5 +1,6 @@
 package br.com.draftpad.service.note;
 
+import br.com.draftpad.model.entity.User;
 import br.com.draftpad.service.note.request.RequestCreatingNote;
 import br.com.draftpad.service.note.request.RequestEditNote;
 import br.com.draftpad.service.note.response.ResponseGetNotes;
@@ -8,6 +9,7 @@ import br.com.draftpad.repository.INoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,7 @@ public class NoteService implements INoteService{
 
     @Override
     public ResponseEntity<?> getNotes() {
+       //var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         try {
             List<Note> notes = repository.findAll();
             if (notes.isEmpty()) {

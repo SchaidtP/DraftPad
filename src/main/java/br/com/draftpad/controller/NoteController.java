@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@Tag(name = "Note", description = "Endpoints for Managing Note")
 @RestController
 @RequestMapping("/api/v1/note")
-@Tag(name = "Note", description = "Endpoints for Managing Note")
 public class NoteController {
 
     @Autowired
