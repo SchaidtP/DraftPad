@@ -1,6 +1,7 @@
 package br.com.draftpad.model.entity;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,20 +10,24 @@ import java.util.UUID;
 public class Note {
 
     @Id
-    @Column(unique = true)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String title;
     private String description;
     private LocalDateTime publicationDate;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     public Note() {
     }
 
     public Note(String title, String description) {
-        this.id = UUID.randomUUID();
         this.title = title;
         this.description = description;
         this.publicationDate = LocalDateTime.now();
+        this.user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 
     public Note(String title, String description, LocalDateTime publicationDate) {
@@ -57,5 +62,13 @@ public class Note {
 
     public void setPublicationDate(LocalDateTime publicationDate) {
         this.publicationDate = publicationDate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

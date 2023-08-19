@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,9 +37,9 @@ public class NoteService implements INoteService{
 
     @Override
     public ResponseEntity<?> getNotes() {
-       //var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         try {
-            List<Note> notes = repository.findAll();
+            var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            List<Note> notes = repository.findAllByUserId(user.getId()).orElse(new ArrayList<>());
             if (notes.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }

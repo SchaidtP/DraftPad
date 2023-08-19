@@ -40,7 +40,20 @@ public class User implements UserDetails, Serializable {
     )
     private List<Permission> permissions;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Note> notes;
+
     public User() { }
+
+    public User(String userName, String password, List<Permission> permissions) {
+        this.userName = userName;
+        this.password = password;
+        this.accountNonExpired = true;
+        this.accountNonLocked = true;
+        this.credentialsNonExpired = true;
+        this.enabled = true;
+        this.permissions = permissions;
+    }
 
     public List<String> getRoles() {
         List<String> roles = new ArrayList<>();
@@ -119,5 +132,13 @@ public class User implements UserDetails, Serializable {
 
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    public List<Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
     }
 }
