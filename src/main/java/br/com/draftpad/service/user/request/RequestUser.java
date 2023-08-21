@@ -1,8 +1,6 @@
 package br.com.draftpad.service.user.request;
 
-import jakarta.persistence.Column;
-
-public class RequestCreatingUser {
+public class RequestUser {
     private String userName;
 
     private String password;

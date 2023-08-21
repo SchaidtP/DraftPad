@@ -1,13 +1,11 @@
 package br.com.draftpad.controller;
 
 import br.com.draftpad.service.user.IUserService;
-import br.com.draftpad.service.user.request.RequestCreatingUser;
+import br.com.draftpad.service.user.request.RequestUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User", description = "Endpoints for Managing User")
 @RestController
@@ -18,7 +16,23 @@ public class UserController {
     private IUserService service;
 
     @PostMapping()
-    public ResponseEntity<?> createUser(RequestCreatingUser requestCreatingUser) {
-        return service.createUser(requestCreatingUser);
+    public ResponseEntity<?> createUser(@RequestBody RequestUser requestUser) {
+        return service.createUser(requestUser);
     }
+
+    @DeleteMapping()
+    public ResponseEntity<?> deleteUser() {
+        return service.deleteUser();
+    }
+
+    @PatchMapping()
+    public ResponseEntity<?> editUser(@RequestBody RequestUser requestUser) {
+        return service.editUser(requestUser);
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getUsers() {
+        return service.getUsers();
+    }
+
 }

@@ -141,4 +141,13 @@ public class User implements UserDetails, Serializable {
     public void setNotes(List<Note> notes) {
         this.notes = notes;
     }
+
+    public boolean seekPermission(String permission) {
+        for (Permission x: this.permissions) {
+            if (x.getDescription().equals(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
