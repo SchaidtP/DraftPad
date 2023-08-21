@@ -9,7 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface IPermissionRepository extends JpaRepository<Permission, Long> {
-
-    List<Permission> findByDescription(String description);
-
+    Permission findByDescription(String description);
 }

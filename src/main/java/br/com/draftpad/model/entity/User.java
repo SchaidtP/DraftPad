@@ -45,14 +45,14 @@ public class User implements UserDetails, Serializable {
 
     public User() { }
 
-    public User(String userName, String password, List<Permission> permissions) {
+    public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
         this.enabled = true;
-        this.permissions = permissions;
+        this.permissions = new ArrayList<>();
     }
 
     public List<String> getRoles() {
@@ -149,5 +149,9 @@ public class User implements UserDetails, Serializable {
             }
         }
         return false;
+    }
+
+    public void addPermission(Permission permission) {
+        this.permissions.add(permission);
     }
 }

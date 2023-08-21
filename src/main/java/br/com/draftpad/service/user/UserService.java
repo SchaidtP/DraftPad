@@ -1,5 +1,6 @@
 package br.com.draftpad.service.user;
 
+import br.com.draftpad.model.entity.Permission;
 import br.com.draftpad.model.entity.User;
 import br.com.draftpad.repository.IUserRepository;
 import br.com.draftpad.service.permission.IPermissionService;
@@ -13,9 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class UserService implements IUserService {
@@ -34,9 +33,9 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Some parameters are null or empty.");
         }
         try {
-            var permissions = iPermissionService.getPermissionUser();
             var password = encryptPassword(requestUser.getPassword());
-            var user = new User(requestUser.getUserName(), password, permissions);
+            var user = new User(requestUser.getUserName(), password);
+            user.addPermission(iPermissionService.getPermissionUser());
             repository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
         } catch (Exception e) {
@@ -85,6 +84,57 @@ public class UserService implements IUserService {
     @Override
     public ResponseEntity<?> getUsers() {
         return null;
+    }
+
+    @Override
+    public ResponseEntity<?> userPermission(UUID id) {
+        String errorMessage;
+        var editedUser = repository.findById(id).orElse(null);
+        if (editedUser == null) {
+            errorMessage = "User not found.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+        var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        if (user.seekPermission("ADMIN") && user.getId() != id && !editedUser.seekPermission("ADMIN")) {
+            try {
+                List<Permission> permissions = new ArrayList<>();
+                var permission = iPermissionService.getPermissionUser();
+                permissions.add(permission);
+                editedUser.setPermissions(permissions);
+                repository.save(editedUser);
+                return ResponseEntity.status(HttpStatus.OK).body("Success when changing user permission");
+            } catch (Exception e) {
+                errorMessage = "Failed to change permission: " + e.getMessage();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            }
+        }
+        errorMessage = "unauthorized moderator";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+    }
+
+    @Override
+    public ResponseEntity<?> moderatorPermission(UUID id) {
+        String errorMessage;
+        var editedUser = repository.findById(id).orElse(null);
+        if (editedUser == null) {
+            errorMessage = "User not found.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+        var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        if (user.seekPermission("ADMIN") || user.seekPermission("MODERATOR")
+                && user.getId() != id && !editedUser.seekPermission("ADMIN")) {
+            try {
+                var permission = iPermissionService.getPermissionModerator();
+                editedUser.addPermission(permission);
+                repository.save(editedUser);
+                return ResponseEntity.status(HttpStatus.OK).body("Success when changing user permission");
+            } catch (Exception e) {
+                errorMessage = "Failed to change permission: " + e.getMessage();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            }
+        }
+        errorMessage = "unauthorized moderator";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
     }
 
     private boolean checkIfParamsIsNotNull(RequestUser requestUser) {

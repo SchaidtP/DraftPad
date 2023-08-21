@@ -5,9 +5,6 @@ import br.com.draftpad.repository.IPermissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 public class PermissionService implements IPermissionService {
 
@@ -15,7 +12,12 @@ public class PermissionService implements IPermissionService {
     private IPermissionRepository repository;
 
     @Override
-    public List<Permission> getPermissionUser() {
+    public Permission getPermissionUser() {
         return repository.findByDescription("USER");
+    }
+
+    @Override
+    public Permission getPermissionModerator() {
+        return repository.findByDescription("MODERATOR");
     }
 }

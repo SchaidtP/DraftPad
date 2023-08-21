@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Tag(name = "User", description = "Endpoints for Managing User")
 @RestController
 @RequestMapping("/api/v1/user")
@@ -35,4 +37,13 @@ public class UserController {
         return service.getUsers();
     }
 
+    @PatchMapping(value = "permission/forUser/{id}")
+    public ResponseEntity<?> userPermission(@PathVariable("id") UUID id) {
+        return service.userPermission(id);
+    }
+
+    @PatchMapping(value = "permission/forModerator/{id}")
+    public ResponseEntity<?> moderatorPermission(@PathVariable("id") UUID id) {
+        return service.moderatorPermission(id);
+    }
 }
