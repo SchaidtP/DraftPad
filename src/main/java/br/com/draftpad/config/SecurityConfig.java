@@ -54,9 +54,11 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**"
                                 ).permitAll()
+                                /*
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/user").hasAnyRole("USER", "MODERATOR")
                                 .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
                                 .requestMatchers("/api/v1/note").hasAnyRole("USER", "MODERATOR")
+                                 */
                                 .requestMatchers("/api/v1/**").authenticated()
                 )
                 .apply(new JwtConfigurer(tokenProvider));

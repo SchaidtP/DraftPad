@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,7 @@ public class NoteService implements INoteService{
     @Override
     public ResponseEntity<?> getNotes() {
         try {
-            var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            var user = this.getAuthenticatedUser();
             List<Note> notes = repository.findAllByUserId(user.getId()).orElse(new ArrayList<>());
             if (notes.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -52,7 +53,9 @@ public class NoteService implements INoteService{
 
     @Override
     public ResponseEntity<?> deleteNote(UUID id) {
-        if (repository.existsById(id)){
+        var note = repository.findById(id).orElse(null);
+        var userName = this.getAuthenticatedUser().getUsername();
+        if (note != null && Objects.equals(note.getUser().getUsername(), userName)){
             try {
                 repository.deleteById(id);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -69,7 +72,8 @@ public class NoteService implements INoteService{
     @Override
     public ResponseEntity<?> editNote(UUID id, RequestEditNote requestEditNote) {
         var note = repository.findById(id).orElse(null);
-        if(note != null){
+        var userName = this.getAuthenticatedUser().getUsername();
+        if (note != null && Objects.equals(note.getUser().getUsername(), userName)){
             if (requestEditNote.getTitle() != null ){
                 note.setTitle(requestEditNote.getTitle());
             }
@@ -99,5 +103,9 @@ public class NoteService implements INoteService{
                             note.getPublicationDate()
                     );
                 }).collect(Collectors.toList());
+    }
+
+    private User getAuthenticatedUser() {
+        return ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 }
