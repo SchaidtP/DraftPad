@@ -83,7 +83,7 @@ public class UserService implements IUserService {
 
     @Override
     public ResponseEntity<?> getUsers() {
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(repository.findAll());
     }
 
     @Override

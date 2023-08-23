@@ -10,11 +10,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,11 +56,6 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**"
                                 ).permitAll()
-                                /*
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/user").hasAnyRole("USER", "MODERATOR")
-                                .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
-                                .requestMatchers("/api/v1/note").hasAnyRole("USER", "MODERATOR")
-                                 */
                                 .requestMatchers("/api/v1/**").authenticated()
                 )
                 .apply(new JwtConfigurer(tokenProvider));
