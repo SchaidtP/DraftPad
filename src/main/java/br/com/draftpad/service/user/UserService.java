@@ -120,7 +120,7 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
         var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        if (user.getRole() == UserRole.ADMIN && user.getId() != id && editedUser.getRole() != UserRole.ADMIN) {
+        if (user.getId() != id && editedUser.getRole() != UserRole.ADMIN) {
             try {
                 editedUser.setRole(UserRole.USER);
                 repository.save(editedUser);
@@ -143,8 +143,7 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
         var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.MODERATOR
-                && user.getId() != id && editedUser.getRole() != UserRole.ADMIN) {
+        if (user.getId() != id && editedUser.getRole() != UserRole.ADMIN) {
             try {
                 editedUser.setRole(UserRole.MODERATOR);
                 repository.save(editedUser);
