@@ -1,10 +1,10 @@
 package br.com.draftpad.service.note;
 
-import br.com.draftpad.model.entity.User;
+import br.com.draftpad.domain.user.User;
 import br.com.draftpad.service.note.request.RequestCreatingNote;
 import br.com.draftpad.service.note.request.RequestEditNote;
 import br.com.draftpad.service.note.response.ResponseGetNotes;
-import br.com.draftpad.model.entity.Note;
+import br.com.draftpad.domain.note.Note;
 import br.com.draftpad.repository.INoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

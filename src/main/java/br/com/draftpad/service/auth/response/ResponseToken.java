@@ -1,5 +1,7 @@
 package br.com.draftpad.service.auth.response;
 
+import br.com.draftpad.domain.user.UserRole;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -8,19 +10,17 @@ public class ResponseToken implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String userName;
-    private Boolean authenticated;
-    private Date created;
-    private Date expiration;
-    private String accessToken;
+
+    private String role;
+
+    private String token;
 
     public ResponseToken() {}
 
-    public ResponseToken(String userName, Boolean authenticated, Date created, Date expiration, String accessToken) {
+    public ResponseToken(String userName, String role, String token) {
         this.userName = userName;
-        this.authenticated = authenticated;
-        this.created = created;
-        this.expiration = expiration;
-        this.accessToken = accessToken;
+        this.role = role;
+        this.token = token;
     }
 
     public String getUserName() {
@@ -31,35 +31,19 @@ public class ResponseToken implements Serializable {
         this.userName = userName;
     }
 
-    public Boolean getAuthenticated() {
-        return authenticated;
+    public String getRole() {
+        return role;
     }
 
-    public void setAuthenticated(Boolean authenticated) {
-        this.authenticated = authenticated;
+    public void setRole(String role) {
+        this.role = role;
     }
 
-    public Date getCreated() {
-        return created;
+    public String getToken() {
+        return token;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getExpiration() {
-        return expiration;
-    }
-
-    public void setExpiration(Date expiration) {
-        this.expiration = expiration;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

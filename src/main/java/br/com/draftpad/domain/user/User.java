@@ -1,11 +1,12 @@
-package br.com.draftpad.model.entity;
+package br.com.draftpad.domain.user;
 
+import br.com.draftpad.domain.note.Note;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,8 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false)
     private String password;
 
+    private UserRole role;
+
     private Boolean accountNonExpired;
 
     private Boolean accountNonLocked;
@@ -33,12 +36,6 @@ public class User implements UserDetails, Serializable {
     private Boolean credentialsNonExpired;
 
     private Boolean enabled;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_permissions", joinColumns = {@JoinColumn (name = "id_user")},
-            inverseJoinColumns = {@JoinColumn (name = "id_permission")}
-    )
-    private List<Permission> permissions;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Note> notes;
@@ -52,20 +49,17 @@ public class User implements UserDetails, Serializable {
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
         this.enabled = true;
-        this.permissions = new ArrayList<>();
-    }
-
-    public List<String> getRoles() {
-        List<String> roles = new ArrayList<>();
-        for(Permission permission: permissions) {
-            roles.add(permission.getDescription());
-        }
-        return roles;
+        this.role = UserRole.USER;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.permissions;
+        if (this.role == UserRole.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else if (this.role == UserRole.MODERATOR) {
+            return List.of(new SimpleGrantedAuthority("ROLE_MODERATOR"), new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -76,6 +70,14 @@ public class User implements UserDetails, Serializable {
     @Override
     public String getUsername() {
         return this.userName;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     @Override
@@ -126,32 +128,11 @@ public class User implements UserDetails, Serializable {
         this.enabled = enabled;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
-    }
-
     public List<Note> getNotes() {
         return notes;
     }
 
     public void setNotes(List<Note> notes) {
         this.notes = notes;
-    }
-
-    public boolean seekPermission(String permission) {
-        for (Permission x: this.permissions) {
-            if (x.getDescription().equals(permission)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void addPermission(Permission permission) {
-        this.permissions.add(permission);
     }
 }

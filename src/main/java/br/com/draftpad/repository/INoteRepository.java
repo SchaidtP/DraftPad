@@ -1,6 +1,6 @@
 package br.com.draftpad.repository;
 
-import br.com.draftpad.model.entity.Note;
+import br.com.draftpad.domain.note.Note;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

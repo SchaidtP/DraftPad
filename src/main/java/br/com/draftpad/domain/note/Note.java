@@ -1,5 +1,6 @@
-package br.com.draftpad.model.entity;
+package br.com.draftpad.domain.note;
 
+import br.com.draftpad.domain.user.User;
 import jakarta.persistence.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 

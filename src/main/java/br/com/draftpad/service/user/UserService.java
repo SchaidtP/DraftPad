@@ -1,10 +1,10 @@
 package br.com.draftpad.service.user;
 
-import br.com.draftpad.model.entity.Permission;
-import br.com.draftpad.model.entity.User;
+import br.com.draftpad.domain.user.User;
+import br.com.draftpad.domain.user.UserRole;
 import br.com.draftpad.repository.IUserRepository;
-import br.com.draftpad.service.permission.IPermissionService;
 import br.com.draftpad.service.user.request.RequestUser;
+import br.com.draftpad.service.user.response.ResponseGetUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +15,13 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
 
     @Autowired
     private IUserRepository repository;
-
-    @Autowired
-    IPermissionService iPermissionService;
 
     @Override
     public ResponseEntity<?> createUser(RequestUser requestUser) {
@@ -35,7 +33,6 @@ public class UserService implements IUserService {
         try {
             var password = encryptPassword(requestUser.getPassword());
             var user = new User(requestUser.getUserName(), password);
-            user.addPermission(iPermissionService.getPermissionUser());
             repository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
         } catch (Exception e) {
@@ -47,7 +44,6 @@ public class UserService implements IUserService {
     @Override
     public ResponseEntity<?> deleteUser() {
         var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        //if (user.seekPermission("ADMIN")) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not allowed");
         try {
             repository.delete(user);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -83,7 +79,36 @@ public class UserService implements IUserService {
 
     @Override
     public ResponseEntity<?> getUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(repository.findAll());
+        try {
+            var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            List<User> users;
+            if (user.getRole() == UserRole.ADMIN) {
+                users = repository.findAll();
+            } else {
+                users = repository.findAllByRole(UserRole.USER).orElse(new ArrayList<>());
+            }
+
+            if (users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(getListResponseGetUsers(users));
+
+        } catch (Exception e) {
+            String errorMessage = "Failed to edit user: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    private List<ResponseGetUsers> getListResponseGetUsers(List<User> users) {
+        return users.stream()
+                .map(user -> {
+                    return new ResponseGetUsers(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getRole().toString()
+                    );
+                }).collect(Collectors.toList());
     }
 
     @Override
@@ -95,12 +120,9 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
         var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        if (user.seekPermission("ADMIN") && user.getId() != id && !editedUser.seekPermission("ADMIN")) {
+        if (user.getRole() == UserRole.ADMIN && user.getId() != id && editedUser.getRole() != UserRole.ADMIN) {
             try {
-                List<Permission> permissions = new ArrayList<>();
-                var permission = iPermissionService.getPermissionUser();
-                permissions.add(permission);
-                editedUser.setPermissions(permissions);
+                editedUser.setRole(UserRole.USER);
                 repository.save(editedUser);
                 return ResponseEntity.status(HttpStatus.OK).body("Success when changing user permission");
             } catch (Exception e) {
@@ -121,11 +143,10 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
         var user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        if (user.seekPermission("ADMIN") || user.seekPermission("MODERATOR")
-                && user.getId() != id && !editedUser.seekPermission("ADMIN")) {
+        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.MODERATOR
+                && user.getId() != id && editedUser.getRole() != UserRole.ADMIN) {
             try {
-                var permission = iPermissionService.getPermissionModerator();
-                editedUser.addPermission(permission);
+                editedUser.setRole(UserRole.MODERATOR);
                 repository.save(editedUser);
                 return ResponseEntity.status(HttpStatus.OK).body("Success when changing user permission");
             } catch (Exception e) {

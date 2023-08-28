@@ -1,7 +1,6 @@
 package br.com.draftpad.service.user;
 
-import br.com.draftpad.model.entity.Permission;
-import br.com.draftpad.model.entity.User;
+import br.com.draftpad.domain.user.User;
 import br.com.draftpad.service.user.request.RequestUser;
 import org.springframework.http.ResponseEntity;
 

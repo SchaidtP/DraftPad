@@ -1,8 +1,8 @@
 package br.com.draftpad.service.auth;
 
-import br.com.draftpad.model.entity.User;
+import br.com.draftpad.domain.user.User;
+import br.com.draftpad.infra.security.TokenService;
 import br.com.draftpad.repository.IUserRepository;
-import br.com.draftpad.security.jwt.JwtTokenProvider;
 import br.com.draftpad.service.auth.request.RequestAccountCredentials;
 import br.com.draftpad.service.auth.response.ResponseToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,33 +17,34 @@ public class AuthService implements IAuthService{
     
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+
     @Autowired
-    private JwtTokenProvider tokenProvider;
-    
+    private IUserRepository repository;
+
     @Autowired
-    private IUserRepository iUserRepository;
+    private TokenService tokenService;
 
     @Override
     public ResponseEntity<?> signin(RequestAccountCredentials requestAccountCredentials) {
-        if (checkIfParamsIsNotNull(requestAccountCredentials)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+        var userInvalid = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username/password supplied!");
+        if (checkIfParamsIsNotNull(requestAccountCredentials)) return userInvalid;
         try {
             String userName = requestAccountCredentials.getUserName();
             String password = requestAccountCredentials.getPassword();
 
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
 
-            User user = iUserRepository.findByUserName(userName);
+            User user = (User) repository.findByUserName(userName);
             if (user != null) {
-                ResponseToken tokenResponse = tokenProvider.createAccessToken(userName, user.getRoles());
+                var token = tokenService.generateToken(user);
+                ResponseToken tokenResponse = new ResponseToken(user.getUsername(), user.getRole().toString(), token);
                 return ResponseEntity.ok(tokenResponse);
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+                return userInvalid;
             }
         }
-        catch (AuthenticationException e) {
-            String errorMessage = "Invalid username/password supplied!";
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
