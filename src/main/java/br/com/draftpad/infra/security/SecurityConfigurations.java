@@ -36,10 +36,10 @@ public class SecurityConfigurations {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "api/v1/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/user").hasAnyRole("ADMIN", "MODERATOR")
+                        .requestMatchers(HttpMethod.DELETE, "api/v1/user").hasAnyRole("MODERATOR", "USER")
                         .requestMatchers("api/v1/user/permission/forModerator/**").hasAnyRole("ADMIN", "MODERATOR")
                         .requestMatchers("api/v1/user/permission/forUser/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "api/v1/user").permitAll()//.hasAnyRole("ADMIN", "MODERATOR")
-                        .requestMatchers(HttpMethod.DELETE, "api/v1/user").hasAnyRole("MODERATOR", "USER")
                         .requestMatchers("api/v1/note").hasAnyRole("MODERATOR", "USER")
                         .anyRequest().authenticated()
                 )
