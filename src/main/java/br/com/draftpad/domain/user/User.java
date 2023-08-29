@@ -27,6 +27,7 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     private Boolean accountNonExpired;

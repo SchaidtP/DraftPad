@@ -58,7 +58,7 @@ public class NoteService implements INoteService{
         if (note != null && Objects.equals(note.getUser().getUsername(), userName)){
             try {
                 repository.deleteById(id);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully");
             } catch (Exception e) {
                 String errorMessage = "Failed to get notes: " + e.getMessage();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);

@@ -38,6 +38,7 @@ public class NoteController {
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             })
     public ResponseEntity<?> createNote(@RequestBody RequestCreatingNote requestCreatingNote) {
@@ -54,6 +55,7 @@ public class NoteController {
                             }),
                        @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                        @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                       @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                        @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                        @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
                })
@@ -61,14 +63,17 @@ public class NoteController {
         return service.getNotes();
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "Deletes a Note",
             description = "Deletes a Note by passing in a Json representation of the note!",
             tags = {"Note"},
             responses = {
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "No content", responseCode = "204",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             })
@@ -80,14 +85,14 @@ public class NoteController {
             value = "{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.TEXT_PLAIN_VALUE})
-    @Operation(summary = "Disable a specific Note by your ID", description = "Disable a specific Note by your ID", tags = {"Note"},
+    @Operation(summary = "Edit Note", description = "Modify a note by its ID", tags = {"Note"},
             responses = {
                     @ApiResponse(description = "OK", responseCode = "200",
                             content = @Content(schema = @Schema(implementation = String.class))
                     ),
-                    @ApiResponse(description = "No Content", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             })
